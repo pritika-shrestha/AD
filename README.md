@@ -1,4 +1,4 @@
-#### Alzheimer’s Disease Detection and Prediction
+## Alzheimer’s Disease Detection and Prediction
 
 ###### Project Description:
 This project focuses on the **detection and prediction of Alzheimer’s disease using deep learning and machine learning models**.
