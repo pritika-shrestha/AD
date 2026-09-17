@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroPredict — Alzheimer's Awareness</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --purple: #6C3CE1;
+            --purple-light: #8B5CF6;
+            --purple-pale: #EDE9FE;
+            --blue: #2563EB;
+            --blue-pale: #EFF6FF;
+            --green: #059669;
+            --green-pale: #ECFDF5;
+            --amber: #D97706;
+            --amber-pale: #FFFBEB;
+            --red-pale: #FEF2F2;
+            --ink: #1a1523;
+            --ink-2: #3d3552;
+            --muted: #7c6f9a;
+            --border: #e8e3f3;
+            --surface: #f9f7fe;
+            --white: #ffffff;
+            --radius: 14px;
+            --radius-sm: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 48px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .brand-name {
+            font-family: 'Fraunces', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+        }
+
+        .brand-tagline {
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-weight: 400;
+            display: block;
+            margin-top: -1px;
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+            color: white;
+            padding: 13px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+        /* ── PAGE ── */
+        .page { max-width: 1240px; margin: 0 auto; padding: 48px 40px 100px; }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, var(--purple) 0%, #4F46E5 50%, var(--blue) 100%);
+            border-radius: 20px;
+            padding: 64px 56px;
+            color: white;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; right: 100px;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 14px;
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            max-width: 560px;
+        }
+
+        .hero p {
+            font-size: 1.05rem;
+            opacity: 0.85;
+            max-width: 500px;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+
+        .btn-hero {
+            background: white;
+            color: var(--purple);
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+        /* ── NOTICE ── */
+        .notice {
+            background: var(--amber-pale);
+            border: 1px solid #FDE68A;
+            border-radius: var(--radius);
+            padding: 16px 22px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 48px;
+            font-size: 0.9rem;
+            color: #78350F;
+        }
+
+        .notice i { color: var(--amber); margin-top: 2px; flex-shrink: 0; }
+
+        /* ── SECTION TITLES ── */
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--purple);
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 28px;
+            letter-spacing: -0.02em;
+        }
+
+        /* ── NAV CARDS ── */
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 56px;
+        }
+
+        .nav-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            display: block;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(108,60,225,0.1);
+            border-color: var(--purple-light);
+        }
+
+        .nav-card-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 14px;
+        }
+
+        .ic-purple { background: linear-gradient(135deg, #6C3CE1, #9B6CF5); }
+        .ic-pink   { background: linear-gradient(135deg, #DB2777, #F472B6); }
+        .ic-amber  { background: linear-gradient(135deg, #D97706, #FBBF24); }
+        .ic-green  { background: linear-gradient(135deg, #059669, #34D399); }
+
+        .nav-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 5px;
+        }
+
+        .nav-card p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        /* ── CONTENT GRID ── */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* ── MAIN COLUMN ── */
+        .main-col { display: flex; flex-direction: column; gap: 28px; }
+
+        /* ── PANEL (white card) ── */
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+        }
+
+        .panel-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .panel-title i { color: var(--purple); font-size: 1rem; }
+        .panel-subtitle { font-size: 0.88rem; color: var(--muted); margin-bottom: 24px; }
+
+        /* ── WARNING SIGNS LIST ── */
+        .signs-list { list-style: none; }
+
+        .sign-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sign-item:last-child { border-bottom: none; }
+
+        .sign-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--purple-pale);
+            color: var(--purple);
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .sign-text { font-size: 0.93rem; color: var(--ink-2); padding-top: 3px; }
+
+        /* ── ALZHEIMER'S INFO CARDS ── */
+        .info-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .info-sub-card {
+            border-radius: var(--radius-sm);
+            padding: 20px;
+        }
+
+        .info-sub-card.purple { background: #F5F3FF; border-left: 3px solid #7C3AED; }
+        .info-sub-card.indigo { background: #EEF2FF; border-left: 3px solid #4F46E5; }
+
+        .info-sub-card h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--ink);
+        }
+
+        .info-sub-card p { font-size: 0.85rem; color: var(--ink-2); line-height: 1.6; }
+
+        /* ── RESOURCES GRID ── */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .resource-card {
+            border-radius: var(--radius-sm);
+            padding: 18px;
+            border: 1px solid var(--border);
+        }
+
+        .resource-card.green-card { background: var(--green-pale); border-color: #A7F3D0; }
+        .resource-card.blue-card  { background: var(--blue-pale);  border-color: #BFDBFE; }
+        .resource-card.purple-card{ background: var(--purple-pale); border-color: #DDD6FE; }
+
+        .resource-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; color: white;
+            margin-bottom: 12px;
+        }
+
+        .resource-icon.g { background: var(--green); }
+        .resource-icon.b { background: var(--blue); }
+        .resource-icon.p { background: var(--purple); }
+
+        .resource-card h4 {
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .resource-card.green-card  h4 { color: #065F46; }
+        .resource-card.blue-card   h4 { color: #1E3A8A; }
+        .resource-card.purple-card h4 { color: #4C1D95; }
+
+        .resource-list {
+            list-style: none;
+            font-size: 0.82rem;
+            color: var(--ink-2);
+        }
+
+        .resource-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            margin-bottom: 5px;
+        }
+
+        .resource-list li i { margin-top: 3px; flex-shrink: 0; font-size: 0.7rem; }
+        .resource-list.g i { color: var(--green); }
+        .resource-list.b i { color: var(--blue); }
+        .resource-list.p i { color: var(--purple); }
+
+        /* ── SIDEBAR ── */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+        /* Stats card */
+        .stats-card {
+            background: linear-gradient(150deg, #4C1D95 0%, #1E3A8A 100%);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            color: white;
+        }
+
+        .stats-card-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            opacity: 0.85;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-block {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .stat-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .stat-num {
+            font-family: 'Fraunces', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 3px;
+        }
+
+        .stat-label { font-size: 0.82rem; opacity: 0.7; }
+
+        /* Prevention tips */
+        .prevention-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            border-top: 3px solid var(--green);
+        }
+
+        .prevention-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--green);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prevention-card p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .tip-list { list-style: none; }
+
+        .tip-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            font-size: 0.85rem;
+            color: var(--ink-2);
+            padding: 5px 0;
+        }
+
+        .tip-list li i { color: var(--green); font-size: 0.7rem; margin-top: 5px; flex-shrink: 0; }
+
+        /* Help card */
+        .help-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+        }
+
+        .help-card h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--ink);
+        }
+
+        .help-card p {
+            font-size: 0.83rem;
+            color: var(--muted);
+            margin-bottom: 14px;
+            line-height: 1.55;
+        }
+
+        .help-link {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.85rem;
+            color: var(--purple);
+            font-weight: 500;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .help-link:last-child { border-bottom: none; }
+        .help-link i { width: 16px; text-align: center; }
+
+        /* ── FAQ ── */
+        .faq-section { margin-top: 48px; }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .faq-item:hover { border-color: var(--purple-light); }
+
+        .faq-q {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--ink);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .faq-toggle {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: var(--purple-pale);
+            color: var(--purple);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+            transition: transform 0.2s;
+        }
+
+        .faq-a {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 10px;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-item.open .faq-a { display: block; }
+        .faq-item.open .faq-toggle { transform: rotate(45deg); background: var(--purple); color: white; }
+
+        /* ── FINAL CTA ── */
+        .final-cta {
+            margin-top: 56px;
+            background: linear-gradient(135deg, var(--purple) 0%, #4F46E5 50%, var(--blue) 100%);
+            border-radius: 20px;
+            padding: 48px 56px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .final-cta-text h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .final-cta-text p { font-size: 0.95rem; opacity: 0.8; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1080px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .nav-cards { grid-template-columns: repeat(2, 1fr); }
+            .resources-grid { grid-template-columns: 1fr 1fr; }
+            .faq-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 680px) {
+            nav { padding: 0 20px; }
+            .page { padding: 28px 20px 60px; }
+            .hero { padding: 40px 28px; }
+            .hero h1 { font-size: 2rem; }
+            .nav-cards { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .info-pair { grid-template-columns: 1fr; }
+            .resources-grid { grid-template-columns: 1fr; }
+            .final-cta { padding: 36px 28px; flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-brain"></i></div>
+            <div>
+                <span class="brand-name">NeuroPredict</span>
+                <span class="brand-tagline">Alzheimer's Prediction & Detection</span>
+            </div>
+        </a>
+        <a href="assess1.html" class="btn-cta" onclick="localStorage.removeItem('neuro_assessment_data')">
+            <i class="fas fa-plus"></i> New Assessment
+        </a>
+    </nav>
+
+    <div class="page">
+
+        <!-- HERO -->
+        <div class="hero">
+            <p class="hero-eyebrow">NeuroPredict Platform</p>
+            <h1>Alzheimer's Awareness &amp; Self-Assessment</h1>
+            <p>Learn about early detection and take a quick self-assessment to understand your risk factors.</p>
+            <a href="assess1.html" class="btn-hero" onclick="localStorage.removeItem('neuro_assessment_data')">
+                <i class="fas fa-arrow-right"></i> Start New Assessment
+            </a>
+        </div>
+
+        <!-- NOTICE -->
+        <div class="notice">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p><strong>Important Notice:</strong> This self-assessment is for educational purposes only and does not replace professional medical advice, diagnosis, or treatment. If you have concerns about memory loss or cognitive changes, please consult with a healthcare provider.</p>
+        </div>
+
+        <!-- QUICK NAV CARDS -->
+        <p class="section-label">Explore</p>
+        <h2 class="section-title">Learn About Alzheimer's</h2>
+
+        <div class="nav-cards">
+            <a href="#understanding" class="nav-card">
+                <div class="nav-card-icon ic-purple"><i class="fas fa-brain"></i></div>
+                <h3>Understanding Alzheimer's</h3>
+                <p>Learn about the disease, its stages, and progression</p>
+            </a>
+            <a href="#warning-signs" class="nav-card">
+                <div class="nav-card-icon ic-pink"><i class="fas fa-chart-line"></i></div>
+                <h3>Early Warning Signs</h3>
+                <p>Recognize the 10 early signs and symptoms</p>
+            </a>
+            <a href="#prevention" class="nav-card">
+                <div class="nav-card-icon ic-amber"><i class="fas fa-heartbeat"></i></div>
+                <h3>Prevention Tips</h3>
+                <p>Lifestyle changes that may reduce risk</p>
+            </a>
+            <a href="#help" class="nav-card">
+                <div class="nav-card-icon ic-green"><i class="fas fa-book-open"></i></div>
+                <h3>Caregiving Resources</h3>
+                <p>Practical advice for family and caregivers</p>
+            </a>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="content-grid">
+
+            <!-- LEFT / MAIN COLUMN -->
+            <div class="main-col">
+
+                <!-- WARNING SIGNS -->
+                <div class="panel" id="warning-signs">
+                    <div class="panel-title"><i class="fas fa-chart-line"></i> 10 Early Warning Signs</div>
+                    <p class="panel-subtitle">Recognizing these signs early can lead to better outcomes through early intervention and treatment.</p>
+                    <ul class="signs-list">
+                        <li class="sign-item"><span class="sign-num">1</span><span class="sign-text">Memory loss that disrupts daily life</span></li>
+                        <li class="sign-item"><span class="sign-num">2</span><span class="sign-text">Challenges in planning or solving problems</span></li>
+                        <li class="sign-item"><span class="sign-num">3</span><span class="sign-text">Difficulty completing familiar tasks</span></li>
+                        <li class="sign-item"><span class="sign-num">4</span><span class="sign-text">Confusion with time or place</span></li>
+                        <li class="sign-item"><span class="sign-num">5</span><span class="sign-text">Trouble understanding visual images</span></li>
+                        <li class="sign-item"><span class="sign-num">6</span><span class="sign-text">New problems with words in speaking or writing</span></li>
+                        <li class="sign-item"><span class="sign-num">7</span><span class="sign-text">Misplacing things and losing ability to retrace steps</span></li>
+                        <li class="sign-item"><span class="sign-num">8</span><span class="sign-text">Decreased or poor judgment</span></li>
+                        <li class="sign-item"><span class="sign-num">9</span><span class="sign-text">Withdrawal from work or social activities</span></li>
+                        <li class="sign-item"><span class="sign-num">10</span><span class="sign-text">Changes in mood and personality</span></li>
+                    </ul>
+                </div>
+
+                <!-- UNDERSTANDING -->
+                <div class="panel" id="understanding">
+                    <div class="panel-title"><i class="fas fa-brain"></i> Understanding Alzheimer's</div>
+                    <p class="panel-subtitle">Alzheimer's disease is a progressive neurological disorder that causes the brain to shrink (atrophy) and brain cells to die. It is the most common cause of dementia.</p>
+                    <div class="info-pair">
+                        <div class="info-sub-card purple">
+                            <h4>What Happens?</h4>
+                            <p>The disease is characterized by two key abnormalities: <strong>Amyloid Plaques</strong> — deposits of protein fragments that build up in the spaces between nerve cells — and <strong>Tau Tangles</strong>, twisted fibers of Tau protein that build up inside the nerve cells.</p>
+                        </div>
+                        <div class="info-sub-card indigo">
+                            <h4>Stages of Progression</h4>
+                            <p>Alzheimer's progresses through three main stages: <strong>Mild</strong> (MCI/Early-Stage, where the person maintains independence), <strong>Moderate</strong> (Middle-Stage, requiring significant assistance), and <strong>Severe</strong> (Late-Stage, requiring full-time care).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAREGIVING RESOURCES -->
+                <div class="panel" id="help">
+                    <div class="panel-title"><i class="fas fa-dumbbell"></i> Caregiving Resources</div>
+                    <p class="panel-subtitle">Research suggests that a combination of lifestyle factors can help reduce the risk or slow the progression of cognitive decline.</p>
+                    <div class="resources-grid">
+                        <div class="resource-card green-card">
+                            <div class="resource-icon g"><i class="fas fa-utensils"></i></div>
+                            <h4>MIND Diet</h4>
+                            <ul class="resource-list g">
+                                <li><i class="fas fa-leaf"></i> Leafy green vegetables daily</li>
+                                <li><i class="fas fa-seedling"></i> Nuts as healthy snacks</li>
+                                <li><i class="fas fa-fish"></i> Fish rich in omega-3 (weekly)</li>
+                                <li><i class="fas fa-wheat-awn"></i> Whole grains &amp; olive oil</li>
+                            </ul>
+                        </div>
+                        <div class="resource-card blue-card">
+                            <div class="resource-icon b"><i class="fas fa-moon"></i></div>
+                            <h4>Quality Sleep</h4>
+                            <ul class="resource-list b">
+                                <li><i class="fas fa-check"></i> Aim for 7–8 hours nightly</li>
+                                <li><i class="fas fa-check"></i> Maintain consistent schedule</li>
+                                <li><i class="fas fa-check"></i> Treat sleep disorders promptly</li>
+                                <li><i class="fas fa-check"></i> Avoid screens before bed</li>
+                            </ul>
+                        </div>
+                        <div class="resource-card purple-card">
+                            <div class="resource-icon p"><i class="fas fa-shield-alt"></i></div>
+                            <h4>Risk Reduction</h4>
+                            <ul class="resource-list p">
+                                <li><i class="fas fa-check"></i> Manage blood pressure &amp; diabetes</li>
+                                <li><i class="fas fa-check"></i> Avoid smoking &amp; excess alcohol</li>
+                                <li><i class="fas fa-check"></i> Protect head from injuries</li>
+                                <li><i class="fas fa-check"></i> Regular health check-ups</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+
+                <!-- KEY FACTS -->
+                <div class="stats-card">
+                    <div class="stats-card-title"><i class="fas fa-key"></i> Key Facts</div>
+                    <div class="stat-block">
+                        <div class="stat-num">6.7M</div>
+                        <div class="stat-label">Americans living with Alzheimer's</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-num">6th</div>
+                        <div class="stat-label">Leading cause of death in the US</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-num">2/3</div>
+                        <div class="stat-label">Of all patients are women</div>
+                    </div>
+                </div>
+
+                <!-- PREVENTION TIPS -->
+                <div class="prevention-card" id="prevention">
+                    <h3><i class="fas fa-heartbeat"></i> Prevention Tips</h3>
+                    <p>Lifestyle habits proven to support brain health:</p>
+                    <ul class="tip-list">
+                        <li><i class="fas fa-check-circle"></i> Stay physically active (aerobic exercise)</li>
+                        <li><i class="fas fa-check-circle"></i> Engage in mental stimulation (puzzles, learning)</li>
+                        <li><i class="fas fa-check-circle"></i> Maintain social connections</li>
+                        <li><i class="fas fa-check-circle"></i> Follow a brain-healthy diet (MIND diet)</li>
+                        <li><i class="fas fa-check-circle"></i> Manage cardiovascular health</li>
+                        <li><i class="fas fa-check-circle"></i> Get quality, consistent sleep</li>
+                        <li><i class="fas fa-check-circle"></i> Protect your head from injury</li>
+                        <li><i class="fas fa-check-circle"></i> Limit alcohol &amp; avoid smoking</li>
+                    </ul>
+                </div>
+
+                <!-- PROFESSIONAL HELP -->
+                <div class="help-card">
+                    <h4>Need Professional Help?</h4>
+                    <p>If you're experiencing memory problems or have concerns, consult with a healthcare professional immediately. Early diagnosis leads to better intervention options.</p>
+                    <a href="tel:1-800-272-3900" class="help-link"><i class="fas fa-phone"></i> 24/7 Helpline: 1-800-272-3900</a>
+                    <a href="https://www.alz.org" target="_blank" class="help-link"><i class="fas fa-globe"></i> alz.org — Online Resources</a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq-section">
+            <p class="section-label">Got Questions?</p>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">
+                        What's the difference between Alzheimer's and dementia?
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <p class="faq-a">Dementia is an umbrella term for symptoms affecting memory and thinking. Alzheimer's is the most common cause of dementia, accounting for 60–80% of cases.</p>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">
+                        At what age does Alzheimer's typically start?
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <p class="faq-a">Most people with Alzheimer's are 65 or older. However, early-onset Alzheimer's can occur in people in their 40s or 50s, though it's less common.</p>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">
+                        Is Alzheimer's hereditary?
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <p class="faq-a">Having a parent or sibling with Alzheimer's increases risk, but it doesn't mean you'll develop it. Lifestyle factors also play a significant role.</p>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">
+                        Can Alzheimer's be prevented?
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <p class="faq-a">While there's no guaranteed prevention, research suggests healthy lifestyle choices — exercise, diet, mental stimulation, and social engagement — may reduce risk.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL CTA -->
+        <div class="final-cta">
+            <div class="final-cta-text">
+                <h2>Ready to take the assessment?</h2>
+                <p>Get an AI-powered analysis in just a few minutes.</p>
+            </div>
+            <a href="assess1.html" class="btn-hero" onclick="localStorage.removeItem('neuro_assessment_data')" style="white-space:nowrap;">
+                <i class="fas fa-arrow-right"></i> Start New Assessment
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleFaq(el) {
+            el.classList.toggle('open');
+        }
+    </script>
+
+</body>
+</html>

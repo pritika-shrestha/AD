@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuroPredict | Medical History</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Color Variables (Identical) */
+        :root {
+            --primary-purple: #7f52f5; 
+            --secondary-purple: #9d7df9;
+            --text-dark: #333;
+            --text-light: #6c757d;
+            --border-light: #e6e6e6;
+            --bg-page: #f4f7f9;
+            --bg-white: #fff;
+            --bg-active: #eceaff; 
+            --success-green: #28a745;
+            --step-grey: #adb5bd;
+            
+            --old-primary-purple: #6a5ae0; 
+            --old-secondary-purple: #8f7dfa;
+
+            /* NEW: Added this variable to control the progress bar width safely */
+            --progress-width: 25%;
+        }
+
+        /* General Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex; 
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .sidebar { display: none; }
+        
+        .logo { display: flex; align-items: center; }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #6C3CE1, #2563EB);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            margin-right: 14px;
+            flex-shrink: 0;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+ 
+        .logo-subtitle {
+            font-size: 0.82rem;
+            color: #7c6f9a;
+            display: block;
+            margin-top: -2px;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0 25px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .main {
+            flex-grow: 1;
+            padding: 40px;
+            background-color: #e5e6eb; 
+            width: 100%;
+        }
+        
+        .assessment-header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-link { 
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-right: 20px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .header-title h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px; 
+            position: relative;
+            padding-bottom: 15px;
+            margin: 0 20px 40px;
+        }
+        
+        .steps::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-light);
+            transform: translateY(-50%);
+            z-index: 0;
+            margin: 0 15px;
+        }
+
+        /* FIXED: Using the CSS Variable for width here */
+        .steps::after { 
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 15px; 
+            width: var(--progress-width); 
+            height: 2px;
+            background-color: var(--success-green);
+            transform: translateY(-50%);
+            z-index: 1; 
+            transition: width 0.4s ease-out;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--step-grey);
+            color: var(--bg-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .completed .circle {
+            background: var(--success-green);
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.2);
+        }
+
+        .active .circle {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5); 
+            color: var(--bg-white);
+            box-shadow: 0 0 0 4px rgba(127, 82, 245, 0.3);
+        }
+        
+        .step p {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-top: 0;
+        }
+        
+        .step.active p, .step.completed p {
+            color: var(--text-dark);
+        }
+
+        .form-section {
+            background: #d0d0d3b2;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #747474b0;
+            border-radius: 4px;
+            margin-right: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: #ccc6c6;
+            border-color: #44434b;
+        }
+        
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: rgb(43, 40, 40);
+            font-size: 18px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .lifestyle-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 25px;
+        }
+        
+        .lifestyle-grid label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            font-size: 15px;
+            background-color: #fcfcfc;
+        }
+        
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-prev {
+            background-color: #e5e6eb46;
+            color: #000000;
+            border: 1px solid var(--border-light);
+        }
+        .btn-prev:hover {
+            box-shadow: 0 6px 15px rgba(127, 125, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-next {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5); 
+            color: var(--bg-white);
+            padding: 20px 25px;
+            font-size: 16px;
+        }
+        .btn-next:hover {
+            box-shadow: 0 6px 15px rgba(127, 82, 245, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #282829, #979797); 
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 20px;
+            color: #f8f8fcda;
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 6px 15px rgba(127, 125, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Form Section */
+.form-section {
+    background: #ffffff !important; /* Pure white for contrast */
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Soft depth */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Modern Input Styling */
+.form-group input, .form-group select {
+    transition: all 0.3s ease; /* Smooth transition for focus/errors */
+    border: 1.5px solid #e0e0e0;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 4px rgba(127, 82, 245, 0.1);
+}
+
+/* --- Visual Hierarchy: Card Styling --- */
+.form-section {
+    background: #ffffff !important; /* Pure white card */
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* --- Progress Line: Visible Track --- */
+.steps::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px; /* Visible track thickness */
+    background: #e0e0e6; /* Constant grey background line */
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.steps::after { 
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0; 
+    width: var(--progress-width, 25%); 
+    height: 4px;
+    background-color: #28a745; /* Green fill */
+    transform: translateY(-50%);
+    z-index: 1; 
+    transition: width 0.4s ease-out;
+}
+
+/* --- Interactive Feedback: Red Box State --- */
+.error {
+    border: 2px solid #ff4d4d !important;
+    background-color: #fffafa !important;
+}
+
+/* --- Clickable Steps Styling --- */
+.step {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.step:hover {
+    transform: translateY(-2px);
+}
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="top-bar"> 
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <div class="logo-text">
+                    <h2 class="logo-title">NeuroPredict</h2>
+                    <span class="logo-subtitle">Alzheimer’s Prediction and Detection</span>
+                </div>
+            </div>
+            <a href="dashboard.html" class="btn btn-secondary">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+        </div>
+        
+        <div class="assessment-header">
+            <a href="assess1.html" class="back-link"><i class="fas fa-arrow-left"></i></a>
+            <div class="header-main-title">
+                <h2>Medical History</h2>
+            </div>
+        </div>
+
+        <div class="steps" id="assessmentSteps">
+            <div class="step completed" onclick="location.href='assess1.html'">
+                <div class="circle"><i class="fas fa-check"></i></div> 
+                <p>Patient Information</p>
+            </div>
+            <div class="step active" onclick="location.href='assess2.html'">
+                <div class="circle">2</div>
+                <p>Medical History</p>
+            </div>
+            <div class="step" onclick="validateAndGo(3)"><div class="circle">3</div><p>Cognitive</p></div>
+            <div class="step" onclick="validateAndGo(4)"><div class="circle">4</div><p>Scan</p></div>
+            <div class="step" onclick="validateAndGo(5)"><div class="circle">5</div><p>Review</p></div>
+        </div>
+
+        <div class="form-section">
+            <h2>Medical History</h2>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="condition" value="Alzheimers" /> Family History of Alzheimer’s</label>
+                <label><input type="checkbox" name="condition" value="Hypertension" /> Hypertension (High Blood Pressure)</label>
+                <label><input type="checkbox" name="condition" value="Diabetes" /> Diabetes</label>
+                <label><input type="checkbox" name="condition" value="HeartDisease" /> Heart Disease</label>
+                <label><input type="checkbox" name="condition" value="Stroke" /> History of Stroke</label>
+                <label><input type="checkbox" name="condition" value="Depression" /> Depression</label>
+                <label><input type="checkbox" name="condition" value="HeadInjury" /> Previous Head Injury</label>
+            </div>
+
+            <h2 style="margin-top: 30px;">Lifestyle Factors</h2>
+
+            <div class="lifestyle-grid">
+                <div>
+                    <label>Smoking Status</label>
+                    <select id="smoking">
+                        <option>Never Smoked</option>
+                        <option>Former Smoker</option>
+                        <option>Current Smoker</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Alcohol Consumption</label>
+                    <select id="alcohol">
+                        <option>None</option>
+                        <option>Occasional</option>
+                        <option>Frequent</option>
+                        <option>Heavy</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Physical Activity Level</label>
+                    <select id="activity">
+                        <option>Low Activity (Sedentary)</option>
+                        <option>Moderate Activity</option>
+                        <option>High Activity (Daily)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="education">Years of Education</label>
+                    <select id="education" name="education">
+                        <option value="">Select Education Level</option>
+                        <option value="Primary">Primary School</option>
+                        <option value="Secondary">Secondary School</option>
+                        <option value="HighSchool">High School</option>
+                        <option value="Bachelors">Bachelor's</option>
+                        <option value="Masters">Master's</option>
+                        <option value="PhD">PhD</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <a href="assess1.html" class="btn btn-prev"><i class="fas fa-arrow-left"></i> Previous</a>
+                <button onclick="collectAndSaveCurrentPageData()" class="btn btn-next">Next <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // --- FIXED STEPPER PROGRESS LOGIC ---
+        const updateStepperProgress = () => {
+            const stepsContainer = document.getElementById('assessmentSteps');
+            const allSteps = stepsContainer.querySelectorAll('.step');
+            const totalSteps = allSteps.length;
+
+            if (totalSteps > 1) {
+                const segments = totalSteps - 1; 
+                let activeIndex = -1;
+                
+                allSteps.forEach((step, index) => {
+                    if (step.classList.contains('active')) activeIndex = index;
+                    
+                    if (step.classList.contains('completed')) {
+                        const circle = step.querySelector('.circle');
+                        if (circle && !circle.querySelector('i')) {
+                            circle.innerHTML = '<i class="fas fa-check"></i>';
+                        }
+                    }
+                });
+
+                const progressSteps = (activeIndex === -1) ? 1 : activeIndex;
+                const progressPercentage = (progressSteps / segments) * 100;
+                
+                // NEW SECURE WAY: Instead of reading stylesheets, we update the variable on the element
+                stepsContainer.style.setProperty('--progress-width', `${progressPercentage}%`);
+            }
+        };
+
+        function getAssessmentData() {
+            return JSON.parse(localStorage.getItem('neuro_assessment_data') || '{}');
+        }
+
+        function saveAssessmentData(newData) {
+            const existingData = getAssessmentData();
+            const combinedData = { ...existingData, ...newData }; 
+            localStorage.setItem('neuro_assessment_data', JSON.stringify(combinedData));
+        }
+
+        function collectAndSaveCurrentPageData() {
+            const conditions = Array.from(document.querySelectorAll('input[name="condition"]:checked'))
+                                    .map(cb => cb.value);
+            
+            const currentPageData = {
+                medicalConditions: conditions,
+                smokingStatus: document.getElementById('smoking').value,
+                alcoholConsumption: document.getElementById('alcohol').value,
+                activityLevel: document.getElementById('activity').value,
+                educationYears: document.getElementById('education').value
+            };
+            
+            saveAssessmentData(currentPageData);
+            window.location.href = 'assess3.html';
+        }
+
+        function loadFormData() {
+            const data = getAssessmentData();
+            if (data.medicalConditions) {
+                data.medicalConditions.forEach(val => {
+                    const cb = document.querySelector(`input[value="${val}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+            if (data.smokingStatus) document.getElementById('smoking').value = data.smokingStatus;
+            if (data.alcoholConsumption) document.getElementById('alcohol').value = data.alcoholConsumption;
+            if (data.activityLevel) document.getElementById('activity').value = data.activityLevel;
+            if (data.educationYears) document.getElementById('education').value = data.educationYears;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFormData();
+            updateStepperProgress();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+    loadFormData();
+    updateStepperProgress();
+
+    // Micro-interaction: Check for empty required fields on blur
+    const educationInput = document.getElementById('education');
+    educationInput.addEventListener('blur', () => {
+        if (!educationInput.value || educationInput.value < 0) {
+            educationInput.classList.add('error');
+        } else {
+            educationInput.classList.remove('error');
+        }
+    });
+});
+
+function collectAndSaveCurrentPageData() {
+    const educationInput = document.getElementById('education');
+    
+    // Validation: Only turn red if empty; no pop-ups
+            if (!educationInput.value) {
+            educationInput.classList.add('error');
+            return;
+        } else {
+            educationInput.classList.remove('error');
+        }
+
+    const conditions = Array.from(document.querySelectorAll('input[name="condition"]:checked'))
+                            .map(cb => cb.value);
+    
+    const currentPageData = {
+        medicalConditions: conditions,
+        smokingStatus: document.getElementById('smoking').value,
+        alcoholConsumption: document.getElementById('alcohol').value,
+        activityLevel: document.getElementById('activity').value,
+        educationYears: educationInput.value
+    };
+    
+    saveAssessmentData(currentPageData);
+    window.location.href = 'assess3.html';
+}
+
+function validateAndGo(step) {
+    // Logic to move forward only if current page is valid
+    if (step > 2) {
+        collectAndSaveCurrentPageData();
+    }
+}
+    </script>
+</body>
+</html>

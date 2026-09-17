@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroPredict - Cognitive Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Color Variables (Identical to assess2) */
+        :root {
+            --primary-purple: #7f52f5; 
+            --secondary-purple: #9d7df9;
+            --text-dark: #333;
+            --text-light: #6c757d;
+            --border-light: #e6e6e6;
+            --bg-page: #f4f7f9;
+            --bg-white: #fff;
+            --bg-active: #eceaff; 
+            --success-green: #28a745;
+            --step-grey: #adb5bd;
+            
+            --old-primary-purple: #6a5ae0; 
+            --old-secondary-purple: #8f7dfa;
+
+            /* NEW: Added variable for dynamic progress */
+            --progress-width: 50%;
+        }
+        
+        /* General Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex; 
+        }
+
+        .dashboard-container {
+            background-color: #e5e6eb;
+            width: 100%; 
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* --------------------
+            Top Bar (Header Navigation) 
+        -------------------- */
+        .top-bar {
+            width: 100%;
+            padding: 40px 40px; 
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #6C3CE1, #2563EB);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            margin-right: 14px;
+            flex-shrink: 0;
+        }
+
+        .logo-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+ 
+        .logo-subtitle {
+            font-size: 0.82rem;
+            color: #7c6f9a;
+            display: block;
+            margin-top: -2px;
+        }
+
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+
+        /* --------------------
+            Main Content 
+        -------------------- */
+        .main-content { 
+            flex-grow: 1;
+            padding: 0 40px 40px 40px; 
+            width: 100%; 
+        }
+
+        .assessment-header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .assessment-header .back-link { 
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-right: 20px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .assessment-header .back-link:hover {
+            color: #858588;
+        }
+        
+        .header-title-group {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .header-main-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* --------------------
+            Assessment Steps (Stepper)
+        -------------------- */
+        .assessment-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+            margin: 0 20px 40px;
+        }
+
+        .assessment-steps::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-light);
+            transform: translateY(-50%);
+            z-index: 0;
+            margin: 0 15px;
+        }
+        
+        .assessment-steps::after { 
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            /* FIXED: Now uses the CSS variable */
+            width: var(--progress-width); 
+            height: 2px;
+            background-color: var(--success-green);
+            transform: translateY(-50%);
+            z-index: 1; 
+            transition: width 0.4s ease-out;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--step-grey);
+            color: var(--bg-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: center;
+            font-weight: 500;
+            padding: 0 5px;
+        }
+
+        .step-completed .step-circle {
+            background: var(--success-green); 
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.2);
+        }
+
+        .step-completed .step-label {
+             color: var(--text-dark);
+        }
+
+        .step-active .step-circle {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5);
+            box-shadow: 0 0 0 4px rgba(127, 82, 245, 0.3);
+        }
+
+        /* --------------------
+            Content Panel
+        -------------------- */
+        .content-panel {
+            background: #d0d0d3b2;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-panel h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .instructions {
+            background-color: #f7f3ff;
+            border-left: 5px solid var(--primary-purple);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .instructions strong {
+            color: var(--primary-purple);
+            font-weight: 600;
+        }
+
+        .assessment-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .assessment-card {
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 20px;
+            background-color: var(--bg-white);
+        }
+
+        .assessment-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .assessment-card p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .rating-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rating-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            flex-shrink: 0;
+            width: 90px; 
+            text-align: center;
+        }
+
+        .slider-track {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            position: relative;
+            padding: 0 10px;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px; 
+            background: var(--border-light);
+            border-radius: 4px;
+            outline: none;
+            opacity: 1;
+            transition: opacity 0.2s;
+            flex-grow: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--bg-white);
+            border: 5px solid #64646e;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            transition: border-color 0.2s;
+        }
+        
+        .slider:hover::-webkit-slider-thumb {
+             border-color: #3a3a3b;
+        }
+
+        .rating-value {
+            background-color: var(--primary-purple);
+            color: var(--bg-white);
+            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1rem;
+            min-width: 40px;
+            text-align: center;
+            flex-shrink: 0;
+            background: linear-gradient(to right, #979797, #282829); 
+            margin-left: 10px;
+            box-shadow: 0 3px 8px rgba(127, 82, 245, 0.3);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #282829, #979797); 
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 20px;
+            color: #f8f8fcda;
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 6px 15px rgba(127, 125, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-prev {
+            background-color: #e5e6eb46;
+            color: #000000;
+            border: 1px solid var(--border-light);
+        }
+        .btn-prev:hover {
+            box-shadow: 0 6px 15px rgba(127, 125, 129, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-next {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5); 
+            color: var(--bg-white);
+            padding: 19px 25px;
+            font-size: 16px;
+        }
+        
+        .btn-next:hover {
+            box-shadow: 0 6px 15px rgba(127, 82, 245, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Form Section */
+        .form-section {
+            background: #ffffff !important; /* Pure white for contrast */
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Soft depth */
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Modern Input Styling */
+        .form-group input, .form-group select {
+            transition: all 0.3s ease; /* Smooth transition for focus/errors */
+            border: 1.5px solid #e0e0e0;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 4px rgba(127, 82, 245, 0.1);
+        }
+
+        /* --- Visual Hierarchy: Card Styling --- */
+        .form-section {
+            background: #ffffff !important; /* Pure white card */
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- Progress Line: Visible Track --- */
+        .steps::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px; /* Visible track thickness */
+            background: #e0e0e6; /* Constant grey background line */
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .steps::after { 
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0; 
+            width: var(--progress-width, 25%); 
+            height: 4px;
+            background-color: #28a745; /* Green fill */
+            transform: translateY(-50%);
+            z-index: 1; 
+            transition: width 0.4s ease-out;
+        }
+
+        /* --- Interactive Feedback: Red Box State --- */
+        .error {
+            border: 2px solid #ff4d4d !important;
+            background-color: #fffafa !important;
+        }
+
+        /* --- Clickable Steps Styling --- */
+        .step {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .step:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="top-bar">
+            <a href="dashboard.html" class="logo-link">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <div class="logo-text">
+                    <h2 class="logo-title">NeuroPredict</h2>
+                    <span class="logo-subtitle">Alzheimer’s Prediction and Detection</span>
+                </div>
+            </a>
+            
+            <a href="dashboard.html" class="btn btn-secondary">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+        </div>
+        
+        <main class="main-content">
+            <div class="assessment-header">
+                <a href="assess2.html" class="back-link" title="Back to Medical History">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                
+                <div class="header-title-group">
+                    <h2 class="header-main-title">Cognitive Assessment</h2>
+                </div>
+            </div>
+
+            <div class="assessment-steps" id="assessmentSteps">
+                <div class="step step-completed">
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <span class="step-label">Patient Information</span>
+                </div>
+                <div class="step step-completed">
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <span class="step-label">Medical History</span>
+                </div>
+                <div class="step step-active">
+                    <div class="step-circle">3</div>
+                    <span class="step-label">Cognitive Assessment</span>
+                </div>
+                <div class="step">
+                    <div class="step-circle">4</div>
+                    <span class="step-label">Scan Upload</span>
+                </div>
+                <div class="step">
+                    <div class="step-circle">5</div>
+                    <span class="step-label">Review & Submit</span>
+                </div>
+            </div>
+            
+            <div class="content-panel">
+                <h3>Symptom Severity Rating</h3>
+                <div class="instructions">
+                    <strong>Instructions:</strong> Rate each symptom on a scale of 0-10, where <strong>0</strong> means "not present" and <strong>10</strong> means "severely present".
+                </div>
+
+                <div class="assessment-cards">
+                    <div class="assessment-card">
+                        <h4>Memory Loss (Recent Events)</h4>
+                        <p>Forgetting recently learned information or important dates</p>
+                        <div class="rating-control">
+                            <span class="rating-label">Not Present (0)</span>
+                            <div class="slider-track">
+                                <input type="range" min="0" max="10" value="0" class="slider" id="slider1">
+                                <span class="rating-value" id="value1">0</span>
+                            </div>
+                            <span class="rating-label">Severely Present (10)</span>
+                        </div>
+                    </div>
+
+                    <div class="assessment-card">
+                        <h4>Planning & Problem Solving</h4>
+                        <p>Trouble following a plan or working with numbers</p>
+                        <div class="rating-control">
+                            <span class="rating-label">Not Present (0)</span>
+                            <div class="slider-track">
+                                <input type="range" min="0" max="10" value="0" class="slider" id="slider2">
+                                <span class="rating-value" id="value2">0</span>
+                            </div>
+                            <span class="rating-label">Severely Present (10)</span>
+                        </div>
+                    </div>
+
+                    <div class="assessment-card">
+                        <h4>Confusion with Time or Place</h4>
+                        <p>Losing track of dates, seasons, or passage of time</p>
+                        <div class="rating-control">
+                            <span class="rating-label">Not Present (0)</span>
+                            <div class="slider-track">
+                                <input type="range" min="0" max="10" value="0" class="slider" id="slider3">
+                                <span class="rating-value" id="value3">0</span>
+                            </div>
+                            <span class="rating-label">Severely Present (10)</span>
+                        </div>
+                    </div>
+
+                    <div class="assessment-card">
+                        <h4>Trouble with Words</h4>
+                        <p>Difficulty following or joining conversations</p>
+                        <div class="rating-control">
+                            <span class="rating-label">Not Present (0)</span>
+                            <div class="slider-track">
+                                <input type="range" min="0" max="10" value="0" class="slider" id="slider4">
+                                <span class="rating-value" id="value4">0</span>
+                            </div>
+                            <span class="rating-label">Severely Present (10)</span>
+                        </div>
+                    </div>
+
+                    <div class="assessment-card">
+                        <h4>Mood & Personality Changes</h4>
+                        <p>Becoming confused, suspicious, or withdrawn</p>
+                        <div class="rating-control">
+                            <span class="rating-label">Not Present (0)</span>
+                            <div class="slider-track">
+                                <input type="range" min="0" max="10" value="0" class="slider" id="slider5">
+                                <span class="rating-value" id="value5">0</span>
+                            </div>
+                            <span class="rating-label">Severely Present (10)</span>
+                        </div>
+                    </div>
+
+                    <div class="assessment-card">
+                        <h4>Social Withdrawal</h4>
+                        <p>Removing from hobbies or social activities</p>
+                        <div class="rating-control">
+                            <span class="rating-label">Not Present (0)</span>
+                            <div class="slider-track">
+                                <input type="range" min="0" max="10" value="0" class="slider" id="slider6">
+                                <span class="rating-value" id="value6">0</span>
+                            </div>
+                            <span class="rating-label">Severely Present (10)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="assess2.html" class="btn btn-prev"><i class="fas fa-arrow-left"></i> Previous</a>
+                    <button onclick="collectAndSaveCurrentPageData()" class="btn btn-next">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- STEPPER PROGRESS LOGIC ---
+        const updateStepperProgress = () => {
+            const stepsContainer = document.getElementById('assessmentSteps');
+            const allSteps = stepsContainer.querySelectorAll('.step');
+            const totalSteps = allSteps.length;
+
+            if (totalSteps > 1) {
+                const segments = totalSteps - 1; 
+                let activeIndex = -1;
+                allSteps.forEach((step, index) => {
+                    if (step.classList.contains('step-active')) activeIndex = index;
+                    if (step.classList.contains('step-completed')) {
+                        const circle = step.querySelector('.step-circle');
+                        if (circle && circle.innerHTML.indexOf('fa-check') === -1) {
+                            circle.innerHTML = '<i class="fas fa-check"></i>';
+                        }
+                    }
+                });
+
+                const progressSteps = (activeIndex === -1) ? 2 : activeIndex;
+                const progressPercentage = (progressSteps / segments) * 100;
+                
+                // FIXED: Instead of cssRules, we update the CSS Variable directly
+                document.documentElement.style.setProperty('--progress-width', `${progressPercentage}%`);
+            }
+        };
+
+        // --- CORE STORAGE UTILITIES ---
+        function getAssessmentData() {
+            return JSON.parse(localStorage.getItem('neuro_assessment_data') || '{}');
+        }
+
+        function saveAssessmentData(newData) {
+            const existingData = getAssessmentData();
+            const combinedData = { ...existingData, ...newData };
+            localStorage.setItem('neuro_assessment_data', JSON.stringify(combinedData));
+        }
+
+        // --- SLIDER INTERACTION LOGIC ---
+        const setupSliders = () => {
+            const sliders = document.querySelectorAll('.slider');
+            sliders.forEach(slider => {
+                const valueId = 'value' + slider.id.replace('slider', '');
+                const ratingValue = document.getElementById(valueId);
+                
+                if (ratingValue) ratingValue.textContent = slider.value; 
+
+                slider.addEventListener('input', () => {
+                    if (ratingValue) ratingValue.textContent = slider.value;
+                });
+            });
+        };
+
+        // --- PAGE SPECIFIC LOGIC ---
+        function collectAndSaveCurrentPageData() {
+            const cognitiveData = {
+                memoryScore: document.getElementById('slider1').value,
+                planningScore: document.getElementById('slider2').value,
+                confusionScore: document.getElementById('slider3').value,
+                wordsScore: document.getElementById('slider4').value,
+                moodScore: document.getElementById('slider5').value,
+                withdrawalScore: document.getElementById('slider6').value
+            };
+
+            const rawSum = Object.values(cognitiveData).reduce((a, b) => parseInt(a) + parseInt(b), 0);
+            const mmseEstimate = Math.max(0, 30 - (rawSum / 2)); 
+
+            saveAssessmentData({
+                ...cognitiveData,
+                calculated_mmse: mmseEstimate
+            });
+
+            window.location.href = 'assess4.html';
+        }
+
+        function loadFormData() {
+            const data = getAssessmentData();
+            const sliderIds = ['slider1', 'slider2', 'slider3', 'slider4', 'slider5', 'slider6'];
+            
+            sliderIds.forEach(id => {
+                const savedValue = data[getMappingKey(id)];
+                if (savedValue) {
+                    const slider = document.getElementById(id);
+                    if (slider) {
+                        slider.value = savedValue;
+                        const valueDisplay = document.getElementById('value' + id.replace('slider', ''));
+                        if (valueDisplay) valueDisplay.textContent = savedValue;
+                    }
+                }
+            });
+        }
+
+        function getMappingKey(id) {
+            const mapping = {
+                'slider1': 'memoryScore',
+                'slider2': 'planningScore',
+                'slider3': 'confusionScore',
+                'slider4': 'wordsScore',
+                'slider5': 'moodScore',
+                'slider6': 'withdrawalScore'
+            };
+            return mapping[id];
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupSliders();
+            loadFormData();
+            updateStepperProgress();
+        });
+    </script>
+</body>
+</html>

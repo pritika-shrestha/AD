@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroPredict - Assessment Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary-purple: #7f52f5;
+            --text-dark: #333;
+            --text-light: #6c757d;
+            --border-light: #e6e6e6;
+            --bg-page: #f4f7f9;
+            --success-green: #28a745;
+            --danger-red: #dc3545;
+            --warning-orange: #ffc107;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-page); color: var(--text-dark); min-height: 100vh; padding: 40px; }
+
+        .results-panel {
+            background: white;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .btn-area { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        .btn { padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-primary { background: linear-gradient(to right, #3B82F6, #8B2CF5); color: white; }
+        .btn-primary:hover { box-shadow: 0 6px 15px rgba(127, 82, 245, 0.4); transform: translateY(-1px); }
+        .btn-outline { background: #eee; color: var(--text-dark); }
+        .btn-outline:hover { background: #e0e0e0; transform: translateY(-1px); }
+
+        #error-msg { color: var(--danger-red); text-align: center; display: none; margin-bottom: 20px; font-weight: bold; }
+
+        /* ── Screen recommendations ── */
+        .rec-section-header { display: flex; align-items: center; gap: 10px; margin: 28px 0 14px; }
+        .rec-section-bar { width: 4px; height: 22px; background: #7f52f5; border-radius: 2px; flex-shrink: 0; }
+        .rec-section-title { font-size: 1rem; font-weight: 700; color: #333; }
+        .rec-badge { margin-left: auto; font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+        .rec-legend { display: flex; gap: 18px; margin-bottom: 14px; }
+        .rec-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #6c757d; }
+        .rec-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+        .rec-card { border-radius: 10px; padding: 13px 15px; margin-bottom: 9px; display: flex; gap: 13px; align-items: flex-start; background: white; }
+        .rec-card.urgent   { border: 0.5px solid #f09595; border-left: 3px solid #E24B4A; }
+        .rec-card.advisory { border: 0.5px solid #FAC775; border-left: 3px solid #BA7517; }
+        .rec-card.routine  { border: 0.5px solid #C0DD97; border-left: 3px solid #3B6D11; }
+
+        .rec-icon-wrap { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .rec-icon-wrap.urgent   { background: #FCEBEB; }
+        .rec-icon-wrap.advisory { background: #FAEEDA; }
+        .rec-icon-wrap.routine  { background: #EAF3DE; }
+
+        .rec-body { flex: 1; }
+        .rec-title { font-size: 0.87rem; font-weight: 600; margin-bottom: 3px; }
+        .rec-title.urgent   { color: #791F1F; }
+        .rec-title.advisory { color: #633806; }
+        .rec-title.routine  { color: #27500A; }
+        .rec-desc { font-size: 0.8rem; color: #6c757d; line-height: 1.5; }
+
+        .rec-tag { font-size: 0.7rem; font-weight: 600; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+        .rec-tag.urgent   { color: #E24B4A; }
+        .rec-tag.advisory { color: #BA7517; }
+        .rec-tag.routine  { color: #3B6D11; }
+
+        /* ── PDF section titles ── */
+        .pdf-h3 {
+            font-size: 0.82rem; font-weight: 700; color: #333;
+            margin: 20px 0 8px; padding-bottom: 5px;
+            border-bottom: 1.5px solid #e6e6e6;
+            text-transform: uppercase; letter-spacing: 0.06em;
+        }
+
+        /* ── PDF rec cards ── */
+        .pdf-rec-card { border-radius: 7px; padding: 9px 12px; margin-bottom: 7px; display: flex; gap: 10px; align-items: flex-start; page-break-inside: avoid; }
+        .pdf-rec-card.urgent   { border: 0.5px solid #f09595; border-left: 3px solid #E24B4A; }
+        .pdf-rec-card.advisory { border: 0.5px solid #FAC775; border-left: 3px solid #BA7517; }
+        .pdf-rec-card.routine  { border: 0.5px solid #C0DD97; border-left: 3px solid #3B6D11; }
+        .pdf-rec-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 2px; }
+        .pdf-rec-title.urgent   { color: #791F1F; }
+        .pdf-rec-title.advisory { color: #633806; }
+        .pdf-rec-title.routine  { color: #27500A; }
+        .pdf-rec-desc { font-size: 0.78rem; color: #6c757d; line-height: 1.45; }
+        .pdf-rec-tag { font-size: 0.68rem; font-weight: 600; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+        .pdf-rec-tag.urgent   { color: #E24B4A; }
+        .pdf-rec-tag.advisory { color: #BA7517; }
+        .pdf-rec-tag.routine  { color: #3B6D11; }
+    </style>
+</head>
+<body>
+
+    <div id="error-msg">⚠️ No assessment data found. Please complete the assessment steps first.</div>
+
+    <!-- ════════════════════ SCREEN VIEW ════════════════════ -->
+    <div id="screenView">
+        <div class="results-panel">
+
+            <div style="text-align:center; padding: 20px 0;">
+                <p style="color:#6c757d; font-size:0.9rem;">Record ID: <span id="resRecordID">--</span></p>
+                <p style="font-size:0.75rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#7f52f5; margin:18px 0 4px;">Patient</p>
+                <h2 id="resName" style="font-size:2rem; font-weight:700; color:#333; margin:0;">--</h2>
+            </div>
+
+            <!-- Prediction card -->
+            <div id="resCard" style="text-align:center; padding:30px; border-radius:12px; border:2px solid #e6e6e6; margin:20px 0;">
+                <div style="font-size:0.85rem; color:#999; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.07em;">AI Assessment Result</div>
+                <div id="resStatus" style="font-size:2rem; font-weight:700;">--</div>
+                <div id="resDesc" style="margin-top:10px; color:#6c757d; font-size:0.95rem;">--</div>
+            </div>
+
+
+
+            <div class="btn-area">
+                <a href="dashboard.html" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <button id="downloadBtn" onclick="downloadPDF()" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download Full Report
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ════════════════════ PDF VIEW ════════════════════ -->
+    <div id="pdfView" style="display:none;">
+        <div id="reportContent" style="background:white; width:190mm; margin:0 auto; padding:8mm 12mm; font-family:'Inter',sans-serif; color:#333;">
+
+            <!-- Header -->
+            <div style="text-align:center; margin-bottom:14px; border-bottom:2px solid #7f52f5; padding-bottom:10px;">
+                <h1 style="color:#7f52f5; font-size:1.45rem; margin:0; font-weight:700;">NeuroPredict Clinical Assessment Report</h1>
+                <p style="color:#6c757d; font-size:0.88rem; margin-top:5px;">
+                    Record ID: <span id="pdfRecordID">--</span> &nbsp;|&nbsp; Generated: <span id="pdfDate">--</span>
+                </p>
+            </div>
+
+            <!-- ── ROW 1: Patient Info (left) + MRI Scan (right) ── -->
+            <div style="display:flex; gap:16px; margin-bottom:16px; align-items:stretch;">
+
+                <!-- Patient Info -->
+                <div style="flex:1.6; border:1px solid #e6e6e6; border-radius:8px; padding:14px 16px;">
+                    <div style="font-size:0.82rem; font-weight:700; color:#7f52f5; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #e6e6e6;">Patient Information</div>
+                    <table style="width:100%; border-collapse:collapse; font-size:0.95rem;">
+                        <tr>
+                            <td style="color:#6c757d; padding:5px 10px 5px 0; width:38%;">Full Name</td>
+                            <td style="font-weight:600;" id="pdfName">--</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#6c757d; padding:5px 10px 5px 0;">Age / Gender</td>
+                            <td style="font-weight:600;" id="pdfAgeGen">--</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#6c757d; padding:5px 10px 5px 0;">Education</td>
+                            <td style="font-weight:600;" id="pdfEdu">--</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#6c757d; padding:5px 10px 5px 0;">Handedness</td>
+                            <td style="font-weight:600;" id="pdfHand">--</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#6c757d; padding:5px 10px 5px 0;">MMSE Screening Score</td>
+                            <td style="font-weight:600;" id="pdfMMSE">--</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- MRI Scan -->
+                <div style="flex:1; border:1px solid #e6e6e6; border-radius:8px; padding:14px 16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="font-size:0.82rem; font-weight:700; color:#7f52f5; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; width:100%;">MRI Scan</div>
+                    <img id="pdfMRIImage" style="max-width:140px; max-height:130px; border-radius:8px; border:1px solid #e6e6e6; margin-top:4px;">
+                </div>
+
+            </div>
+
+            <!-- ── AI Prediction Result (full width) ── -->
+            <div style="font-size:0.82rem; font-weight:700; color:#333; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px; padding-bottom:6px; border-bottom:1.5px solid #e6e6e6;">AI Prediction Result</div>
+            <div id="pdfResCard" style="padding:14px 18px; border-radius:10px; border:2px solid #e6e6e6; margin-bottom:16px; text-align:center;">
+                <div id="pdfStatus" style="font-size:1.5rem; font-weight:700;">--</div>
+                <div id="pdfDesc" style="color:#6c757d; margin-top:6px; font-size:0.93rem;">--</div>
+
+                 <div style="font-size:0.75rem; color:#999; margin-top:8px;">
+        *MMSE score shown above is for clinical reference only and is not used in AI prediction.
+    </div>
+            </div>
+
+            <!-- ── Recommendations (full width) ── -->
+            <div style="font-size:0.82rem; font-weight:700; color:#333; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px; padding-bottom:6px; border-bottom:1.5px solid #e6e6e6;">What To Do Next</div>
+            <div style="display:flex; gap:16px; margin-bottom:10px; font-size:0.85rem; color:#6c757d;">
+                <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#E24B4A;display:inline-block;"></span> Urgent</span>
+                <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#BA7517;display:inline-block;"></span> Advisory</span>
+                <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#3B6D11;display:inline-block;"></span> Routine</span>
+            </div>
+            <div id="pdfRecList"></div>
+
+            <!-- Disclaimer -->
+            <div style="background:#fff8e1; border-radius:7px; padding:10px 14px; font-size:0.85rem; color:#856404; margin-top:12px; line-height:1.55;">
+                <strong>Note:</strong> This report is AI-generated and for information only. It is not a medical diagnosis. Please consult a doctor before making any health decisions.
+            </div>
+
+            <!-- Footer -->
+            <div style="text-align:center; margin-top:10px; padding-top:8px; border-top:1px solid #e6e6e6; font-size:0.78rem; color:#aaa;">
+                NeuroPredict &nbsp;·&nbsp; AI-Assisted Cognitive Assessment &nbsp;·&nbsp; Confidential Patient Report
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        const ASSESSMENT_KEY = 'neuro_assessment_data';
+        function getAssessmentData() {
+            return JSON.parse(localStorage.getItem(ASSESSMENT_KEY) || '{}');
+        }
+
+        /* ══ Recommendations data ══ */
+        const RECOMMENDATIONS = {
+            'Non Demented': [
+                { level:'routine',  title:'Yearly memory check',           desc:'Do a simple memory test once a year to catch any early changes.' },
+                { level:'routine',  title:'Stay active and social',         desc:'Walk or exercise most days and spend time with others both help keep the brain healthy.' },
+                { level:'routine',  title:'Eat well and sleep enough',      desc:'Eat a balanced diet and aim for 7–8 hours of sleep each night to lower future risk.' },
+                { level:'routine',  title:'Check heart health',             desc:'Keep blood pressure, cholesterol, and blood sugar under control as these affect brain health too.' }
+            ],
+            'Very mild Dementia': [
+                { level:'urgent',   title:'See a neurologist soon',            desc:'Book an appointment with a brain specialist within 4–6 weeks for a proper check-up.' },
+                { level:'advisory', title:'Repeat memory test in 3 months',    desc:'Do another memory test in 3 months. If the score drops by 3+ points, see a doctor urgently.' },
+                { level:'advisory', title:'Try brain-training activities',      desc:'Joining a structured memory activity group can help slow down changes at this early stage.' },
+                { level:'routine',  title:'Stay active and social',            desc:'Regular exercise and spending time with people are simple ways to support brain health.' },
+                { level:'routine',  title:'Repeat full scan in 1 year',        desc:'Come back for a full assessment in 12 months to track any changes over time.' }
+            ],
+            'Mild Dementia': [
+                { level:'urgent',   title:'See a neurologist now',               desc:'Book a neurology appointment soon, a proper diagnosis and treatment plan is needed.' },
+                { level:'urgent',   title:'Get a detailed brain MRI',            desc:'A full MRI scan is needed to look more closely at what is happening in the brain.' },
+                { level:'advisory', title:'Ask about memory medicines',          desc:'Talk to a doctor about whether medicines like donepezil could help manage symptoms.' },
+                { level:'advisory', title:'Plan for help at home',               desc:'Check if the home is safe and think about getting a helper or carer involved now.' },
+                { level:'advisory', title:'Repeat memory test in 6 weeks',       desc:'Do another memory test in 6 weeks to track changes, especially if treatment starts.' },
+                { level:'routine',  title:'Keep a daily routine and move gently',desc:'A simple daily routine and light walking can reduce stress and help with daily life.' }
+            ],
+            'Moderate Dementia': [
+                { level:'urgent',   title:'See a neurologist within 2 weeks',   desc:'Get a referral as soon as possible as this stage needs urgent medical attention and a care plan.' },
+                { level:'urgent',   title:'Full memory and thinking assessment', desc:'A thorough test of memory, speech, and thinking is needed to understand the full picture.' },
+                { level:'urgent',   title:'Arrange a full-time carer now',       desc:'The patient needs help to stay safe at home. Arrange family or professional care right away.' },
+                { level:'advisory', title:'Review all current medicines',        desc:'Check all medicines with a doctor as some can affect the brain and may need adjusting.' },
+                { level:'advisory', title:'Sort out legal and financial matters', desc:'While the patient can still take part, arrange legal documents like power of attorney.' },
+                { level:'advisory', title:'Join a memory care programme',        desc:'A memory care programme provides regular support, monitoring, and guidance for carers.' }
+            ]
+        };
+
+        const BADGE_LABELS = {
+            'Non Demented':       { text:'All Routine',                          bg:'#EAF3DE', color:'#27500A' },
+            'Very mild Dementia': { text:'1 Urgent · 2 Advisory · 2 Routine',   bg:'#f8d7da', color:'#721c24' },
+            'Mild Dementia':      { text:'2 Urgent · 3 Advisory · 1 Routine',   bg:'#f8d7da', color:'#721c24' },
+            'Moderate Dementia':  { text:'3 Urgent · 3 Advisory',               bg:'#f8d7da', color:'#721c24' }
+        };
+
+        const ICONS = {
+            urgent:   `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" fill="#E24B4A"/><rect x="7.25" y="6" width="1.5" height="4" rx="0.75" fill="white"/><rect x="7.25" y="11" width="1.5" height="1.5" rx="0.75" fill="white"/></svg>`,
+            advisory: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#BA7517"/><rect x="7.25" y="5" width="1.5" height="4" rx="0.75" fill="white"/><rect x="7.25" y="10.5" width="1.5" height="1.5" rx="0.75" fill="white"/></svg>`,
+            routine:  `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#3B6D11"/><path d="M5 8.5L7 10.5L11 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+        };
+
+        function buildScreenRecs(recs) {
+            return recs.map(r => `
+                <div class="rec-card ${r.level}">
+                    <div class="rec-icon-wrap ${r.level}">${ICONS[r.level]}</div>
+                    <div class="rec-body">
+                        <div class="rec-title ${r.level}">${r.title}</div>
+                        <div class="rec-desc">${r.desc}</div>
+                    </div>
+                    <div class="rec-tag ${r.level}">${r.level.charAt(0).toUpperCase()+r.level.slice(1)}</div>
+                </div>`).join('');
+        }
+
+        function buildPdfRecs(recs) {
+            return recs.map(r => {
+                const colors = {
+                    urgent:   { border:'#E24B4A', bg:'#fff5f5', title:'#791F1F', tag:'#E24B4A' },
+                    advisory: { border:'#BA7517', bg:'#fffbf0', title:'#633806', tag:'#BA7517' },
+                    routine:  { border:'#3B6D11', bg:'#f6fbef', title:'#27500A', tag:'#3B6D11' }
+                };
+                const c = colors[r.level];
+                return `<div style="border-radius:6px; padding:8px 12px; margin-bottom:6px; border:0.5px solid ${c.border}; border-left:3px solid ${c.border}; background:${c.bg}; display:flex; align-items:baseline; gap:12px;">
+                    <span style="font-size:0.9rem; font-weight:700; color:${c.title}; white-space:nowrap; flex-shrink:0;">${r.title}</span>
+                    <span style="font-size:0.88rem; color:#555; line-height:1.45; flex:1;">${r.desc}</span>
+                    <span style="font-size:0.8rem; font-weight:600; color:${c.tag}; white-space:nowrap; flex-shrink:0;">${r.level.charAt(0).toUpperCase()+r.level.slice(1)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        /* ══ Main init ══ */
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = getAssessmentData();
+
+            if (!data.patientName && data.patient_name)      data.patientName     = data.patient_name;
+            if (!data.patientName && data.name)               data.patientName     = data.name;
+            if (!data.educationYears && data.education)       data.educationYears  = data.education;
+            if (!data.educationYears && data.education_years) data.educationYears  = data.education_years;
+            if (!data.calculated_mmse && data.mmse)           data.calculated_mmse = data.mmse;
+            if (!data.calculated_mmse && data.mmse_score)     data.calculated_mmse = data.mmse_score;
+            if (!data.prediction_result && data.predictionResult) data.prediction_result = data.predictionResult;
+            if (!data.mri_image_base64 && data.mriImage)      data.mri_image_base64 = data.mriImage;
+
+            if (!data.patientName) {
+                document.getElementById('error-msg').style.display = 'block';
+                document.getElementById('screenView').style.display = 'none';
+                return;
+            }
+
+            const predColors = {
+                'Non Demented':'#28a745','Very mild Dementia':'#ffc107',
+                'Mild Dementia':'#fd7e14','Moderate Dementia':'#dc3545'
+            };
+
+            const result   = data.prediction_result || 'N/A';
+            if(result === "INVALID MRI IMAGE"){
+    document.getElementById("downloadBtn").style.display = "none";
+}
+
+            const color    = predColors[result] || '#7f52f5';
+            const recordID = data.db_patient_id ? 'DB-' + data.db_patient_id : 'Pending sync';
+            const recs     = RECOMMENDATIONS[result] || [];
+
+            /* Screen */
+            document.getElementById('resRecordID').innerText = recordID;
+            document.getElementById('resName').innerText     = data.patientName || 'N/A';
+            const statusEl = document.getElementById('resStatus');
+            statusEl.innerText                               = result;
+            statusEl.style.color                             = color;
+            document.getElementById('resCard').style.borderColor = color;
+            document.getElementById('resCard').style.background  = color + '18';
+            // document.getElementById('resDesc').innerText = result === 'Non Demented'
+            //     ? 'No structural markers of dementia detected.'
+            //     : `Features consistent with ${result}. Clinical consultation is advised.`;
+            
+            if(result === "INVALID MRI IMAGE"){
+        document.getElementById('resDesc').innerText = "Please upload a valid brain MRI scan.";
+    }
+    else if(result === 'Non Demented'){
+        document.getElementById('resDesc').innerText = 'No structural markers of dementia detected.';
+    }
+    else{
+        document.getElementById('resDesc').innerText =
+            `Features consistent with ${result}. Clinical consultation is advised.`;
+    }
+
+
+            /* PDF */
+            document.getElementById('pdfRecordID').innerText        = recordID;
+            document.getElementById('pdfDate').innerText            = new Date().toLocaleString();
+            document.getElementById('pdfName').innerText            = data.patientName || 'N/A';
+            document.getElementById('pdfAgeGen').innerText          = `${data.age||'--'} / ${data.gender||'--'}`;
+            document.getElementById('pdfEdu').innerText             = data.educationYears || 'N/A';
+            document.getElementById('pdfHand').innerText            = data.hand==='R'?'Right':(data.hand==='L'?'Left':(data.hand||'N/A'));
+            document.getElementById('pdfMMSE').innerText            = `${data.calculated_mmse||0} / 30`;
+            document.getElementById('pdfStatus').innerText          = result;
+            document.getElementById('pdfStatus').style.color        = color;
+            document.getElementById('pdfResCard').style.borderColor = color;
+            // document.getElementById('pdfDesc').innerText            = result === 'Non Demented'
+            //     ? 'No structural markers of dementia detected.'
+            //     : `Features consistent with ${result}. Clinical consultation is advised.`;
+            
+            if(result === "INVALID MRI IMAGE"){
+    document.getElementById('pdfDesc').innerText = "Invalid MRI image uploaded.";
+}
+else if(result === 'Non Demented'){
+    document.getElementById('pdfDesc').innerText = 'No structural markers of dementia detected.';
+}
+else{
+    document.getElementById('pdfDesc').innerText =
+        `Features consistent with ${result}. Clinical consultation is advised.`;
+}
+
+            const pdfImg = document.getElementById('pdfMRIImage');
+            if (data.mri_image_base64) { pdfImg.src = data.mri_image_base64; }
+            else { pdfImg.style.display = 'none'; }
+
+            document.getElementById('pdfRecList').innerHTML = buildPdfRecs(recs);
+        });
+
+        /* ══ PDF download ══ */
+        function downloadPDF() {
+            const screenView  = document.getElementById('screenView');
+            const pdfView     = document.getElementById('pdfView');
+            const patientName = document.getElementById('pdfName').innerText || 'Patient';
+            screenView.style.display = 'none';
+            pdfView.style.display    = 'block';
+            html2pdf().set({
+                margin:      [5, 8, 5, 8],
+                filename:    `NeuroPredict_Report_${patientName.replace(/\s+/g,'_')}.pdf`,
+                image:       { type:'jpeg', quality:0.95 },
+                html2canvas: { scale:2, scrollY:0, useCORS:true, width: 794 },
+                jsPDF:       { unit:'mm', format:'a4', orientation:'portrait' },
+                pagebreak:   { mode: 'avoid-all' }
+            }).from(document.getElementById('reportContent')).save().then(() => {
+                pdfView.style.display    = 'none';
+                screenView.style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>

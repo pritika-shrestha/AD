@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroPredict - Scan Upload</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Color Variables */
+        :root {
+            --primary-purple: #7f52f5; 
+            --secondary-purple: #9d7df9;
+            --text-dark: #333;
+            --text-light: #6c757d;
+            --border-light: #e6e6e6;
+            --bg-page: #f4f7f9;
+            --bg-white: #fff;
+            --bg-active: #eceaff; 
+            --success-green: #28a745;
+            --step-grey: #adb5bd;
+            --danger-red: #dc3545;
+        }
+        
+        /* General Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex; 
+        }
+
+        .dashboard-container {
+            /* Matched background style with assess2/assess3 */
+            background-color: #e5e6eb; 
+            width: 100%; 
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* --------------------
+            Top Bar (Header Navigation) 
+        -------------------- */
+        .top-bar {
+            width: 100%;
+            padding: 40px 40px; 
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #6C3CE1, #2563EB);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            margin-right: 14px;
+            flex-shrink: 0;
+        }
+
+        .logo-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+ 
+        .logo-subtitle {
+            font-size: 0.82rem;
+            color: #7c6f9a;
+            display: block;
+            margin-top: -2px;
+        }
+
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+       
+
+        /* --------------------
+            Main Content 
+        -------------------- */
+        .main-content {
+            flex-grow: 1;
+            padding: 0 40px 40px 40px; 
+            width: 100%; 
+        }
+
+        .assessment-header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            padding-top: 10px; /* ORIGINAL: 20px; -> CHANGED TO 10px for less top gap */
+            border-top: 1px solid var(--border-light);        
+        }
+
+        .assessment-header .back-link { 
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-right: 20px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .assessment-header .back-link:hover {
+            color: #858588;
+        }
+        
+        .header-title-group {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .assessment-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 15px;
+        }
+
+        /* --------------------
+            Assessment Steps (Stepper)
+        -------------------- */
+        .assessment-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+            margin: 0 20px 40px;
+        }
+
+        .assessment-steps::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-light);
+            transform: translateY(-50%);
+            z-index: 0;
+            margin: 0 15px;
+        }
+        
+        .assessment-steps::after { 
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            width: 75%; /* Set to 75% for Step 4 */
+            height: 2px;
+            background-color: var(--success-green);
+            transform: translateY(-50%);
+            z-index: 1; 
+            transition: width 0.4s ease-out;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--step-grey);
+            color: var(--bg-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: center;
+            font-weight: 500;
+            padding: 0 5px;
+        }
+
+        /* Completed Step Styles */
+        .step-completed .step-circle {
+            background: var(--success-green); 
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.2);
+        }
+
+        .step-completed .step-label {
+             color: var(--text-dark);
+        }
+
+        /* Active Step Styles (Primary Purple Gradient) */
+        .step-active .step-circle {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5);
+            box-shadow: 0 0 0 4px rgba(127, 82, 245, 0.3);
+        }
+
+        /* --------------------
+            Content Panel
+        -------------------- */
+        .content-panel {
+            background: #d0d0d3b2;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-panel h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+        
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- File Upload Area --- */
+        .file-upload-box {
+            border: 2px dashed var(--border-light);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: var(--bg-white);
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .file-upload-box:hover, .file-upload-box.drag-over {
+            border-color: var(--primary-purple);
+            background-color: var(--bg-active);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-purple);
+            margin-bottom: 10px;
+        }
+
+        .upload-text p {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .upload-text button {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5); 
+            color: var(--bg-white);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+        
+        .upload-text button:hover {
+            opacity: 0.9;
+        }
+        
+        .file-restrictions {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 15px;
+        }
+        
+        .file-restrictions strong {
+            color: var(--danger-red);
+        }
+
+        /* --- File Display/Status --- */
+        .file-status {
+            display: none; /* Hide by default, shown by JS */
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--bg-active);
+            border: 1px solid var(--secondary-purple);
+        }
+
+        .file-status-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .file-status-info i {
+            color: var(--success-green);
+            font-size: 1.2rem;
+        }
+
+        .file-remove {
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .file-remove:hover {
+            color: var(--danger-red);
+        }
+
+        /* --- Navigation --- */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .top-bar .btn-secondary {
+            background-color: var(--border-light);
+            color: #f8f8fcaf;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(to right, #282829, #979797); 
+        }
+
+        .top-bar .btn-secondary:hover {
+            background-color: var(--border-light);
+            color: #64646e;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-prev {
+            background-color: #e5e6eb46;
+            color: #000000;
+            border: 1px solid var(--border-light);
+        }
+        .btn-prev:hover {
+            color: #2b2c2c7e;
+            box-shadow: 0 6px 15px rgba(61, 61, 61, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        .btn-next {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5); 
+            color: var(--bg-white);
+        }
+        
+        .btn:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-next:hover {
+            box-shadow: 0 6px 15px rgba(127, 82, 245, 0.4);
+            transform: translateY(-1px);
+            color: #252525;        
+        }
+        
+        @media (max-width: 768px) {
+            .top-bar, .main-content {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            .assessment-steps {
+                margin: 0 0 30px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="top-bar">
+            <a href="dashboard.html" class="logo-link">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <div class="logo-text">
+                    <h2 class="logo-title">NeuroPredict</h2>
+                    <span class="logo-subtitle">Alzheimer’s Prediction and Detection</span>
+                </div>
+            </a>
+            
+            <a href="dashboard.html" class="btn btn-secondary">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+        </div>
+        
+        <main class="main-content">
+            <div class="assessment-header">
+                <a href="assess3.html" class="back-link" title="Back to Cognitive Assessment">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                
+                <div class="header-title-group">
+                    <h2 class="header-main-title">Scan Upload</h2>
+                </div>
+            </div>
+
+            <div class="assessment-steps" id="assessmentSteps">
+                <div class="step step-completed">
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <span class="step-label">Patient Information</span>
+                </div>
+                <div class="step step-completed">
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <span class="step-label">Medical History</span>
+                </div>
+                <div class="step step-completed">
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <span class="step-label">Cognitive Assessment</span>
+                </div>
+                <div class="step step-active">
+                    <div class="step-circle">4</div>
+                    <span class="step-label">Scan Upload</span>
+                </div>
+                <div class="step">
+                    <div class="step-circle">5</div>
+                    <span class="step-label">Review & Submit</span>
+                </div>
+            </div>
+            
+            <div class="content-panel">
+                <h3>Upload Brain Scan (MRI)</h3>
+                
+                <div class="upload-section">
+                    
+                    <div class="file-upload-box" id="fileUploadBox">
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="upload-text">
+                            <p>Drag and drop your file here, or</p>
+                            <button type="button" id="selectFileBtn">Select File</button>
+                            <input type="file" id="fileInput" accept=".png,.jpg" style="display: none;">
+                        </div>
+                        <div class="file-restrictions">
+                            <i class="fas fa-info-circle"></i> **Only MRI Scans** allowed. Max **1 picture**. Formats accepted: **.png** or **.jpg**.
+                        </div>
+                    </div>
+                    
+                    <div class="file-status" id="fileStatus">
+                        <div class="file-status-info">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="fileNameDisplay"></span>
+                        </div>
+                        <i class="fas fa-times file-remove" id="removeFileBtn"></i>
+                    </div>
+
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="assess3.html" class="btn btn-prev"><i class="fas fa-arrow-left"></i> Previous</a>
+                    <a href="assess5.html" class="btn btn-next">Review & Submit <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- Core File Upload Logic ---
+        const fileInput = document.getElementById('fileInput');
+        const selectFileBtn = document.getElementById('selectFileBtn');
+        const fileUploadBox = document.getElementById('fileUploadBox');
+        const fileStatus = document.getElementById('fileStatus');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const removeFileBtn = document.getElementById('removeFileBtn');
+
+        // Handles file selection via button click
+        selectFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Function to display selected file status
+        const displayFile=(file) => {
+            fileNameDisplay.textContent = file.name;
+            fileStatus.style.display = 'flex';
+            fileUploadBox.style.display = 'none';
+        }
+
+        // Function to reset file state
+        const resetFile=() => {
+            fileStatus.style.display = 'none';
+            fileUploadBox.style.display = 'block';
+            fileInput.value = ''; // Clear the input field
+        }
+
+        // Event listener for when a file is chosen
+        // fileInput.addEventListener('change', (event) => {
+        //     if (event.target.files.length > 0) {
+        //         // Enforce single file constraint (built-in to HTML input)
+        //         const file = event.target.files[0];
+        //         const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        //         // Enforce file type constraints (.png or .jpg)
+        //         if (fileExtension === 'png' || fileExtension === 'jpg') {
+        //             displayFile(file);
+        //             uploadAndPredict(file);
+        //             // NOTE: The 'MRI Scans only' constraint is a user instruction, 
+        //             // not enforceable purely client-side without advanced image analysis.
+        //             // We trust the user to follow the instruction.
+        //         } else {
+        //             alert('Invalid file type. Only .png or .jpg files are allowed.');
+        //             resetFile();
+        //         }
+        //     }
+        // });
+       fileInput.addEventListener('change', (event) => {
+    if (event.target.files.length > 0) {
+        const file = event.target.files[0];
+        displayFile(file);
+        uploadAndPredict(file); // base64 is now saved inside this function
+    }
+});
+        // Event listener for removing the file
+        removeFileBtn.addEventListener('click', resetFile);
+
+        // --- Drag and Drop Handlers ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUploadBox.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Highlight box when dragging file over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUploadBox.addEventListener(eventName, () => {
+                fileUploadBox.classList.add('drag-over');
+            }, false);
+        });
+
+        // Remove highlight when drag leaves
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUploadBox.addEventListener(eventName, () => {
+                fileUploadBox.classList.remove('drag-over');
+            }, false);
+        });
+
+        // Handle the actual drop event
+        fileUploadBox.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            // Enforce single file constraint via validation
+            if (dt.files.length === 1) {
+                fileInput.files = dt.files; // Assign the dropped file(s) to the input
+                fileInput.dispatchEvent(new Event('change')); // Trigger the change event for validation
+            } else if (dt.files.length > 1) {
+                alert('Only one file can be uploaded at a time.');
+            }
+        }, false);
+        
+        // --- Stepper Logic (Copied from assess3) ---
+        const updateStepperProgress = () => {
+            const stepsContainer = document.getElementById('assessmentSteps');
+            const allSteps = stepsContainer.querySelectorAll('.step');
+            const totalSteps = allSteps.length;
+
+            if (totalSteps > 1) {
+                const segments = totalSteps - 1; 
+                
+                let activeIndex = -1;
+                allSteps.forEach((step, index) => {
+                    if (step.classList.contains('step-active')) {
+                        activeIndex = index;
+                    }
+                    // Ensure completed steps show the check icon
+                    if (step.classList.contains('step-completed')) {
+                        const circle = step.querySelector('.step-circle');
+                        if (circle && circle.innerHTML.indexOf('fa-check') === -1) {
+                             circle.innerHTML = '<i class="fas fa-check"></i>';
+                        }
+                    }
+                });
+
+                // Set progress line width for Step 4 (index 3 out of 5 steps)
+                const progressSteps = (activeIndex === -1) ? (totalSteps - 1) : activeIndex;
+                const progressPercentage = (progressSteps / segments) * 100;
+                
+                // Find the ::after rule and update its width
+                const styleSheet = document.styleSheets[0];
+                let ruleIndex = -1;
+
+                for (let i = 0; i < styleSheet.cssRules.length; i++) {
+                    const rule = styleSheet.cssRules[i];
+                    if (rule.selectorText && rule.selectorText.includes('.assessment-steps::after')) {
+                        ruleIndex = i;
+                        break;
+                    }
+                }
+                
+                if (ruleIndex !== -1) {
+                    styleSheet.cssRules[ruleIndex].style.width = `${progressPercentage}%`;
+                }
+            }
+        };
+//         async function uploadAndPredict(file) {
+//     const formData = new FormData();
+//     formData.append("file", file);
+
+//     try {
+//         const response = await fetch("/api/upload-and-predict", {
+//             method: "POST",
+//             body: formData
+//         });
+
+//         const result = await response.json();
+
+//         if (response.ok) {
+//             // Save to localStorage
+//             const data = JSON.parse(localStorage.getItem('neuro_assessment_data') || '{}');
+//             data.mri_filename = result.filename;
+//             data.prediction_result = result.result.predicted_class;
+
+
+//             localStorage.setItem('neuro_assessment_data', JSON.stringify(data));
+            
+//             alert("Scan uploaded and prediction completed!");
+//         } else {
+//             alert("Upload failed: " + result.detail);
+//         }
+//     } catch (err) {
+//         alert("Server error during upload.");
+//         console.error(err);
+//     }
+// }
+
+async function uploadAndPredict(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const response = await fetch("/api/upload-and-predict", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+        console.log("SERVER RESPONSE:", result);
+
+        if (!response.ok) {
+            alert("Upload failed: " + (result.message || "Unknown error"));
+            return;
+        }
+
+        // Read base64 AFTER confirmed upload
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = JSON.parse(localStorage.getItem("neuro_assessment_data") || "{}");
+            data.mri_filename           = result.filename;
+            data.prediction_result      = result.result.predicted_class;
+            data.prediction_probabilities = result.result.probabilities;
+            data.mri_image_base64       = e.target.result; // saved here, not in a race
+            localStorage.setItem("neuro_assessment_data", JSON.stringify(data));
+            console.log("SAVED TO LOCALSTORAGE:", data);
+        };
+        reader.readAsDataURL(file);
+
+    } catch (err) {
+        console.error(err);
+        alert("Server error during upload.");
+    }
+}
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStepperProgress();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroPredict - Review & Submit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Color Variables */
+        :root {
+            --primary-purple: #7f52f5; 
+            --secondary-purple: #9d7df9;
+            --text-dark: #333;
+            --text-light: #6c757d;
+            --border-light: #e6e6e6;
+            --bg-page: #f4f7f9;
+            --bg-white: #fff;
+            --bg-active: #eceaff; 
+            --success-green: #28a745;
+            --step-grey: #adb5bd;
+            --danger-red: #dc3545;
+            --info-blue: #007bff;
+            --progress-width: 0%; /* Added variable for easy JS control */
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex; 
+        }
+
+        .dashboard-container {
+            background-color: #e5e6eb; 
+            width: 100%; 
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            width: 100%;
+            padding: 40px; 
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        .logo-link { display: flex; align-items: center; text-decoration: none; }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #6C3CE1, #2563EB);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            margin-right: 14px;
+            flex-shrink: 0;
+        }
+
+        .logo-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+ 
+        .logo-subtitle {
+            font-size: 0.82rem;
+            color: #7c6f9a;
+            display: block;
+            margin-top: -2px;
+        }
+
+        
+        .top-bar .btn-secondary {
+            background: linear-gradient(to right, #282829, #979797); 
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 20px;
+            color: #f8f8fcda;
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 6px 15px rgba(127, 125, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .main-content { flex-grow: 1; padding: 0 40px 40px; width: 100%; }
+
+        .assessment-header {
+            margin-bottom: 30px; display: flex; align-items: center;
+            padding-top: 10px; border-top: 1px solid var(--border-light);
+        }
+
+        .assessment-header .back-link { color: var(--text-dark); font-size: 1.5rem; margin-right: 20px; }
+        .header-main-title { font-size: 1.8rem; font-weight: 600; }
+
+        /* Stepper Styles */
+        .assessment-steps {
+            display: flex; justify-content: space-between;
+            margin: 0 20px 40px; position: relative; padding-bottom: 15px;
+        }
+
+        .assessment-steps::before {
+            content: ""; position: absolute; top: 50%; left: 0; right: 0;
+            height: 2px; background-color: var(--border-light);
+            transform: translateY(-50%); z-index: 0; margin: 0 15px;
+        }
+        
+        /* Updated to use CSS Variable for width */
+        .assessment-steps::after { 
+            content: ""; position: absolute; top: 50%; left: 15px;
+            width: var(--progress-width); 
+            height: 2px; background-color: var(--success-green);
+            transform: translateY(-50%); z-index: 1; transition: width 0.4s ease-out;
+        }
+
+        .step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; flex: 1; }
+        .step-circle {
+            width: 30px; height: 30px; border-radius: 50%;
+            background-color: var(--step-grey); color: var(--bg-white);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; margin-bottom: 10px;
+        }
+        .step-label { font-size: 0.8rem; color: var(--text-light); font-weight: 500; }
+
+        .step-completed .step-circle { background: var(--success-green); box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.2); }
+        .step-active .step-circle { background: linear-gradient(to right, #3B82F6, #8B2CF5); box-shadow: 0 0 0 4px rgba(127, 82, 245, 0.3); }
+
+        .content-panel { background: #d0d0d3b2; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        
+        .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .review-card { background-color: var(--bg-white); padding: 20px; border-radius: 8px; border-left: 5px solid var(--primary-purple); }
+        .review-card.cognitive { border-left-color: #20c997; }
+        .review-card.scan { border-left-color: #dc3545; }
+
+        .review-card h4 { font-size: 1.1rem; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .review-card-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border-light); font-size: 0.95rem; }
+        .review-label { color: var(--text-light); }
+        .review-value { color: var(--text-dark); font-weight: 600; }
+
+        .disclaimer-box { background-color: #fff3cd; color: #856404; padding: 20px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; }
+        .checkbox-group { display: flex; align-items: flex-start; margin-bottom: 30px; gap: 10px; }
+
+        .navigation-buttons { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-light); }
+        .btn { padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: 0.2s; }
+        .btn-prev {
+            background-color: #e5e6eb46;
+            color: #000000;
+            border: 1px solid var(--border-light);
+        }
+        .btn-prev:hover {
+            box-shadow: 0 6px 15px rgba(127, 125, 129, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-submit { 
+            background: linear-gradient(to right, #3B82F6, #8B2CF5); 
+            color: var(--bg-white);
+            padding: 19px 25px;
+            font-size: 16px;
+        }
+        .btn-submit:hover {
+            box-shadow: 0 6px 15px rgba(127, 82, 245, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Enhanced Form Section */
+.form-section {
+    background: #ffffff !important; /* Pure white for contrast */
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Soft depth */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Modern Input Styling */
+.form-group input, .form-group select {
+    transition: all 0.3s ease; /* Smooth transition for focus/errors */
+    border: 1.5px solid #e0e0e0;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 4px rgba(127, 82, 245, 0.1);
+}
+
+/* --- Visual Hierarchy: Card Styling --- */
+.form-section {
+    background: #ffffff !important; 
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* --- Progress Line: Visible Track --- */
+.steps::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px; 
+    background: #e0e0e6; /* The grey track is now always visible */
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.steps::after { 
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0; 
+    width: var(--progress-width, 0%); 
+    height: 4px;
+    background-color: #28a745; 
+    transform: translateY(-50%);
+    z-index: 1; 
+    transition: width 0.4s ease-out;
+}
+
+/* --- Interactive Feedback: Red Box State --- */
+.error {
+    border: 2px solid #ff4d4d !important;
+    background-color: #fffafa !important;
+}
+
+/* --- Clickable Steps Styling --- */
+.step {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.step:hover {
+    transform: translateY(-2px);
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="top-bar">
+            <a href="dashboard.html" class="logo-link">
+             <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <div class="logo-text">
+                    <h2 class="logo-title">NeuroPredict</h2>
+                    <span class="logo-subtitle">Alzheimer’s Prediction and Detection</span>
+                </div>   
+            </a>
+            <a href="dashboard.html" class="btn btn-secondary"><i class="fas fa-th-large"></i> Dashboard</a>
+        </div>
+        
+        <main class="main-content">
+            <div class="assessment-header">
+                <a href="assess4.html" class="back-link"><i class="fas fa-arrow-left"></i></a>
+                <h2 class="header-main-title">Review & Submit</h2>
+            </div>
+
+            <div class="assessment-steps" id="assessmentSteps">
+                <div class="step step-completed"><div class="step-circle"><i class="fas fa-check"></i></div><span class="step-label">Patient Info</span></div>
+                <div class="step step-completed"><div class="step-circle"><i class="fas fa-check"></i></div><span class="step-label">History</span></div>
+                <div class="step step-completed"><div class="step-circle"><i class="fas fa-check"></i></div><span class="step-label">Cognitive</span></div>
+                <div class="step step-completed"><div class="step-circle"><i class="fas fa-check"></i></div><span class="step-label">Scan Upload</span></div>
+                <div class="step step-active"><div class="step-circle">5</div><span class="step-label">Review</span></div>
+            </div>
+            
+            <div class="content-panel">
+                <h3>Final Review of Assessment Data</h3>
+                <div class="review-grid">
+                    <div class="review-card">
+                        <h4>Patient Information <a href="assess1.html" style="color:var(--info-blue)"><i class="fas fa-pencil-alt"></i></a></h4>
+                        <div class="review-card-item"><span class="review-label">Name</span><span class="review-value" id="reviewPatientName">Loading...</span></div>
+                        <div class="review-card-item"><span class="review-label">Age</span><span class="review-value" id="reviewAge">Loading...</span></div>
+                        <div class="review-card-item"><span class="review-label">Gender</span><span class="review-value" id="reviewGender">Loading...</span></div>
+                        <div class="review-card-item"><span class="review-label">Handedness</span><span class="review-value" id="reviewHand">Loading...</span></div>
+                        <div class="review-card-item"><span class="review-label">Education (Yrs)</span><span class="review-value" id="reviewEducation">Loading...</span></div>
+                    </div>
+
+                    <div class="review-card cognitive">
+                        <h4>Cognitive <a href="assess3.html" style="color:var(--info-blue)"><i class="fas fa-pencil-alt"></i></a></h4>
+                        <div class="review-card-item"><span class="review-label">MMSE Score</span><span class="review-value" id="reviewMMSEScore">Loading...</span></div>
+                    </div>
+
+                    <div class="review-card scan">
+                        <h4>MRI Scan <a href="assess4.html" style="color:var(--info-blue)"><i class="fas fa-pencil-alt"></i></a></h4>
+                        <div class="review-card-item"><span class="review-label">File Status</span><span class="review-value" id="reviewFileName">Ready for upload</span></div>
+                    </div>
+                </div>
+
+                <div class="disclaimer-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Important:</strong> Predictions are AI-powered and not a substitute for clinical diagnosis.
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="confirmationCheckbox">
+                    <label for="confirmationCheckbox">I confirm that I have reviewed the data and understand the disclaimer.</label>
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="assess4.html" class="btn btn-prev"><i class="fas fa-arrow-left"></i> Go Back</a>
+                    <button id="submitBtn" class="btn btn-submit" disabled><i class="fas fa-paper-plane"></i> Submit Assessment</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const ASSESSMENT_KEY = 'neuro_assessment_data';
+
+        function getAssessmentData() {
+            return JSON.parse(localStorage.getItem(ASSESSMENT_KEY) || '{}');
+        }
+
+        function loadAssessmentReview() {
+            const data = getAssessmentData();
+            
+            const fieldMapping = {
+                'reviewPatientName': data.patientName,
+                'reviewAge': data.age,
+                'reviewGender': data.gender,
+                'reviewHand': data.hand === 'R' ? 'Right' : (data.hand === 'L' ? 'Left' : data.hand),
+                'reviewEducation': data.educationYears, 
+                'reviewMMSEScore': data.calculated_mmse 
+            };
+
+            for (const [id, value] of Object.entries(fieldMapping)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (id === 'reviewMMSEScore') {
+                        el.textContent = value !== undefined ? `${value} / 30` : 'Not Calculated';
+                    } else {
+                        el.textContent = value || 'N/A';
+                    }
+                }
+            }
+
+            const fileNameDisplay = document.getElementById('reviewFileName');
+            if (fileNameDisplay) {
+                if (data.mri_filename) {
+                    fileNameDisplay.textContent = "Status: Scan Ready (" + data.mri_filename + ")";
+                    fileNameDisplay.style.color = "#28a745";
+                } else {
+                    fileNameDisplay.textContent = "Status: Scan Missing";
+                    fileNameDisplay.style.color = "#dc3545";
+                }
+            }
+        }
+
+        async function submitAssessment() {
+            const data = getAssessmentData();
+            // the below  const data is added later to check 
+            // const data = JSON.parse(localStorage.getItem('neuro_assessment_data') || '{}');
+            const submitBtn = document.getElementById('submitBtn');
+
+            const formData = new FormData();
+            
+            // Required fields for your FastAPI backend
+            formData.append('patientName', data.patientName || "");
+            formData.append('age', String(data.age || "")); 
+            formData.append('gender', data.gender || "");
+            formData.append('hand', data.hand || "");
+            formData.append('education', data.educationYears || "");
+            formData.append('mmse', String(data.calculated_mmse || "0"));    
+            formData.append('mri_filename', data.mri_filename || "");
+            
+            // AFTER (fail loudly if missing):
+if (!data.prediction_result) {
+    alert("Error: Prediction result is missing. Please go back and re-upload the MRI scan.");
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Assessment';
+    return;
+}
+formData.append('prediction', data.prediction_result);
+            
+           
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/submit-assessment', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    if (result.patient_id) {
+                        data.db_patient_id = result.patient_id;
+                        localStorage.setItem(ASSESSMENT_KEY, JSON.stringify(data));
+                    }
+                    // alert("Assessment successfully submitted!");
+                    window.location.href = 'assess6.html'; 
+                } else {
+                    // FIXED: Better error handling to avoid [object Object]
+                    let errorMsg = result.detail || result.message;
+                    if (Array.isArray(result.detail)) {
+                        errorMsg = result.detail.map(e => `${e.loc[1]}: ${e.msg}`).join("\n");
+                    }
+                    alert("Submission Error:\n" + (errorMsg || "Unknown error"));
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Submit Assessment';
+                }
+            } catch (err) {
+                console.error("Connection Error:", err);
+                alert("Connection Error: Server is not responding.");
+                submitBtn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAssessmentReview();
+
+            const checkbox = document.getElementById('confirmationCheckbox');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (checkbox) {
+                checkbox.addEventListener('change', () => {
+                    submitBtn.disabled = !checkbox.checked;
+                });
+            }
+
+            if (submitBtn) {
+                submitBtn.addEventListener('click', () => {
+                    if (confirm("Are you sure you want to submit this assessment?")) {
+                        submitAssessment();
+                    }
+                });
+            }
+
+            document.documentElement.style.setProperty('--progress-width', '100%');
+        });
+    </script>
+</body>
+</html>

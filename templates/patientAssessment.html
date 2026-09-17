@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuroPredict | Patient Records</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Color Variables (Kept consistent) */
+        :root {
+            --primary-purple: #7f52f5; 
+            --secondary-purple: #9d7df9;
+            --text-dark: #333;
+            --text-light: #6c757d;
+            --border-light: #e6e6e6;
+            --bg-page: #f4f7f9;
+            --bg-white: #fff;
+            --bg-active: #eceaff; 
+            --success-green: #0e66239f; /* Used for checkmark in steps */
+            --risk-low: #28a745; /* Green for Low Risk */
+            --risk-high: #dc3545; /* Red for High Risk */
+            --risk-moderate: #ffc107; /* Yellow for Moderate Risk (Added for completeness) */
+            --step-grey: #adb5bd;
+            
+            /* Old primary colors used for sidebar active state, matching previous logic */
+            --old-primary-purple: #6a5ae0; 
+            --old-secondary-purple: #8f7dfa;
+            --link-blue: #007bff;
+        }
+
+        /* General Reset and Base Styles (Kept consistent) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* --------------------
+            Sidebar (PRESERVED STYLES)
+        -------------------- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            height: 100vh;
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(to right, #3B82F6, #8B2CF5); 
+            color: var(--bg-white);
+            padding: 10px;
+            border-radius: 8px;
+            margin-right: 10px;
+            font-size: 20px;
+            line-height: 1;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo-title {
+            font-size: 1.3rem; 
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            line-height: 1.2;
+        }
+
+        .nav {
+            flex-grow: 1;
+            padding: 0 20px; 
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px; 
+            border-radius: 8px;
+            margin-bottom: 5px; 
+            cursor: pointer;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            width: 20px;
+            font-size: 1rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--bg-active);
+            color: var(--old-primary-purple);
+            font-weight: 600;
+        }
+        
+        .nav-item.active i {
+            color: var(--old-primary-purple);
+        }
+
+        .info-box {
+            background: #f1f3ff;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin: auto 20px 20px; 
+        }
+
+        .info-box h4 {
+            font-size: 1rem; 
+            color: var(--old-primary-purple);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .info-box p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        
+        /* --------------------
+            Main Content (Specific to Patient Records)
+        -------------------- */
+        .main {
+            flex-grow: 1;
+            padding: 40px;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        /* Patient List Container */
+        .patients-container {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Search & Filter Bar */
+        .filter-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .tab-button {
+            padding: 10px 25px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            background: var(--bg-page);
+            color: var(--text-dark);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            background: var(--primary-purple);
+            color: var(--bg-white);
+            border-color: var(--primary-purple);
+        }
+
+        /* Patient List */
+        .patient-list {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-light);
+            padding-top: 10px;
+        }
+
+        .patient-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .patient-item:last-child {
+            border-bottom: none;
+        }
+
+        .patient-item:hover {
+            background-color: var(--bg-page);
+            padding-left: 10px;
+            padding-right: 10px;
+            margin: 0 -10px;
+        }
+
+        .patient-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .patient-icon {
+            /* This is the purple circle shown in the screenshot */
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 15px;
+            /* Using the patient ID from the image as text content */
+            color: white; 
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px; /* Added padding to fit the full ID in the screenshot */
+        }
+        
+        .patient-id-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .risk-tag {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .risk-low {
+            background-color: #d4edda;
+            color: var(--risk-low);
+        }
+
+        /* The selected patient's full risk dashboard */
+        .selected-patient-details {
+            margin-top: 40px;
+        }
+
+        .risk-level-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--risk-low);
+            color: var(--bg-white);
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .risk-level-card h3 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .risk-level-card p {
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .risk-icon i {
+            font-size: 3rem;
+            opacity: 0.8;
+        }
+
+        .detail-group {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .detail-group h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-light);
+            font-size: 0.95rem;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        /* Specific styles for Cognitive Assessment Score */
+        .cognitive-score {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .cognitive-score p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+        
+        .cognitive-score span {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">🧠</div>
+            <div class="logo-text">
+                <h2 class="logo-title">NeuroPredict</h2>
+                <span class="logo-subtitle">Alzheimer’s Detection</span>
+            </div>
+        </div>
+
+        <div class="nav">
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="ass1.html" class="nav-item"><i class="fas fa-file-alt"></i> New Assessment</a>
+            <a href="patients.html" class="nav-item active"><i class="fas fa-user-friends"></i> Patient Records</a>
+        </div>
+
+        <div class="info-box">
+            <h4>Early Detection</h4>
+            <p>Comprehensive medical assessment tools</p>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1 class="header-title">Patient Records</h1>
+        <p class="header-subtitle">View and manage assessment history</p>
+
+        <div class="patients-container">
+            <div class="filter-bar">
+                <input type="text" class="search-input" placeholder="🔍 Search patients..." />
+                <div class="tab-buttons">
+                    <button class="tab-button active">All</button>
+                    <button class="tab-button">High Risk</button>
+                    </div>
+            </div>
+
+            <div class="patient-list">
+                <div class="patient-item">
+                    <div class="patient-info">
+                        <div class="patient-icon">PT...5045</div> 
+                        <span class="patient-id-text">PT1764266905045</span>
+                    </div>
+                    <span class="risk-tag risk-low">low</span>
+                </div>
+                
+                <div class="patient-item">
+                    <div class="patient-info">
+                        <div class="patient-icon" style="background: linear-gradient(45deg, #ffa726, #ff8a65);">P...4567</div>
+                        <span class="patient-id-text">PT17642669124567</span>
+                    </div>
+                    <span class="risk-tag" style="background-color: #fff3cd; color: var(--risk-moderate);">moderate</span>
+                </div>
+
+                <div class="patient-item">
+                    <div class="patient-info">
+                        <div class="patient-icon" style="background: linear-gradient(45deg, #ef5350, #d32f2f);">P...8901</div>
+                        <span class="patient-id-text">PT17642669238901</span>
+                    </div>
+                    <span class="risk-tag" style="background-color: #f8d7da; color: var(--risk-high);">high</span>
+                </div>
+
+            </div>
+            
+            <div class="selected-patient-details">
+                
+                <div class="risk-level-card">
+                    <div>
+                        <h3>LOW</h3>
+                        <p>Risk Score: 0%</p>
+                    </div>
+                    <div class="risk-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+
+                <div class="detail-group">
+                    <h4><i class="fas fa-user"></i> Patient Information</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">Full Name</span>
+                        <span class="detail-value">N/A</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Patient ID</span>
+                        <span class="detail-value">PT1764266905045</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Age</span>
+                        <span class="detail-value">N/A years</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Gender</span>
+                        <span class="detail-value">N/A</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Contact</span>
+                        <span class="detail-value">N/A</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Assessment Date</span>
+                        <span class="detail-value">11/27/2025</span>
+                    </div>
+                </div>
+
+                <div class="detail-group">
+                    <h4><i class="fas fa-file-medical-alt"></i> Medical History</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">Family History Alzheimers</span>
+                        <span class="detail-value">No</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Hypertension</span>
+                        <span class="detail-value">No</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Diabetes</span>
+                        <span class="detail-value">No</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Heart Disease</span>
+                        <span class="detail-value">No</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Stroke History</span>
+                        <span class="detail-value">No</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Depression</span>
+                        <span class="detail-value">No</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Head Injury</span>
+                        <span class="detail-value">No</span>
+                    </div>
+                </div>
+
+                <div class="detail-group">
+                    <h4><i class="fas fa-brain"></i> Cognitive Assessment</h4>
+                    <div class="cognitive-score">
+                        <p>6</p>
+                        <span>Total Score / 60</span>
+                    </div>
+                </div>
+                
+                <div class="detail-group">
+                    <h4><i class="fas fa-file-upload"></i> Medical Scan</h4>
+                    <p style="text-align: center; color: var(--text-light);">No scan uploaded</p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
