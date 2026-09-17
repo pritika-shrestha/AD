@@ -1,6 +1,6 @@
 ## Alzheimer’s Disease Detection and Prediction
 
-###### Project Description:
+### Project Description:
 This project focuses on the **detection and prediction of Alzheimer’s disease using deep learning and machine learning models**.
 
 In this project, two different approaches were trained and compared:
@@ -9,7 +9,7 @@ In this project, two different approaches were trained and compared:
 
 The models were trained using the dataset and their performance was evaluated based on the obtained results. The main purpose of the project is to understand their performance in Alzheimer’s disease detection.
 
-##### Objectives
+### Objectives
 * To prepare and preprocess the dataset.
 * To train a hybrid **CNN + SVM** model.
 * To train a **Vision Transformer (ViT)** model.
